@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HydroCalcs – Riscaldamento Olio</title>
+  <style>
+    body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial; margin: 0; background: #0b0f14; color: #e8eef6; }
+    header { padding: 18px 16px; border-bottom: 1px solid #1b2533; }
+    header h1 { margin: 0; font-size: 18px; font-weight: 650; }
+    header p { margin: 6px 0 0; color: #a9b6c7; font-size: 13px; }
+
+    .wrap { max-width: 980px; margin: 0 auto; padding: 16px; display: grid; gap: 14px; grid-template-columns: 1fr; }
+    @media (min-width: 900px){ .wrap { grid-template-columns: 1fr 1fr; } }
+
+    .card { background: #0f1722; border: 1px solid #1b2533; border-radius: 14px; padding: 14px; }
+    .card h2 { margin: 0 0 10px; font-size: 15px; }
+    label { display: block; font-size: 12px; color: #a9b6c7; margin-top: 10px; }
+    input, select, button {
+      width: 100%; padding: 10px 12px; margin-top: 6px;
+      border-radius: 10px; border: 1px solid #223046; background: #0b111a; color: #e8eef6;
+      font-size: 14px;
+    }
+    button { cursor: pointer; background: #1a2a44; border-color: #2a3d5e; font-weight: 650; }
+    button:hover { filter: brightness(1.05); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .out { display: grid; gap: 10px; }
+    .kpi { background: #0b111a; border: 1px solid #223046; border-radius: 12px; padding: 12px; }
+    .kpi .k { color: #a9b6c7; font-size: 12px; }
+    .kpi .v { font-size: 20px; margin-top: 4px; font-weight: 700; }
+
+    .sub { color: #a9b6c7; font-size: 12px; margin-top: 8px; line-height: 1.35; }
+    .warnlist { margin: 0; padding-left: 18px; }
+    .warnlist li { margin: 6px 0; color: #ffd38a; }
+    .ok { color: #9be59b; }
+    .err { color: #ff9b9b; }
+    footer { padding: 16px; color: #7f8da1; font-size: 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HydroCalcs</h1>
+    <p>Modulo 1: stima tempo riscaldamento olio (MVP). Base pronta per aggiungere altri calcoli.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Input</h2>
+
+      <label>Tipo olio</label>
+      <select id="oilType">
+        <option value="generic">Generico</option>
+        <option value="iso_vg_32">ISO VG 32</option>
+        <option value="iso_vg_46" selected>ISO VG 46</option>
+        <option value="iso_vg_68">ISO VG 68</option>
+      </select>
+
+      <div class="grid2">
+        <div>
+          <label>Litri olio (L)</label>
+          <input id="liters" type="number" inputmode="decimal" value="400" min="0" step="1" />
+        </div>
+        <div>
+          <label>Potenza resistenza (W)</label>
+          <input id="powerW" type="number" inputmode="decimal" value="1500" min="0" step="10" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>T iniziale (°C)</label>
+          <input id="tStart" type="number" inputmode="decimal" value="10" step="1" />
+        </div>
+        <div>
+          <label>T finale (°C)</label>
+          <input id="tEnd" type="number" inputmode="decimal" value="40" step="1" />
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button id="btn_calc">Calcola</button>
+        <div class="sub">Suggerimento: se hai ricircolo/agitazione, i warning su hotspot diminuiscono.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Risultati</h2>
+
+      <div class="out">
+        <div class="kpi">
+          <div class="k">Tempo stimato</div>
+          <div class="v" id="out_time">-</div>
+          <div class="sub">Stima con efficienza termica indicata sotto (perdite incluse).</div>
+        </div>
+
+        <div class="grid2">
+          <div class="kpi">
+            <div class="k">Energia</div>
+            <div class="v" id="out_energy">-</div>
+            <div class="sub" id="out_energy_th">-</div>
+          </div>
+          <div class="kpi">
+            <div class="k">Potenza specifica</div>
+            <div class="v" id="out_wpl">-</div>
+            <div class="sub">Indicatore rischio hotspot.</div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="kpi">
+            <div class="k">Massa olio (stima)</div>
+            <div class="v" id="out_mass">-</div>
+          </div>
+          <div class="kpi">
+            <div class="k">Efficienza assunta</div>
+            <div class="v" id="out_eff">-</div>
+            <div class="sub">Parametro tarabile (default 85%).</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px; border-radius:12px;">
+          <h2 style="margin:0 0 8px; font-size:14px;">Warning</h2>
+          <div id="warnings"></div>
+        </div>
+      </div>
+
+      <div class="sub">
+        Nota: è una stima “da campo”. Se vuoi farla diventare super credibile, aggiungiamo: temperatura ambiente, isolamento serbatoio, ricircolo, e coefficiente perdite tarato su casi reali.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © HydroCalcs – MVP locale. Nessun dato inviato a server.
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
