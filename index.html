@@ -134,6 +134,34 @@
   <footer>
     © HydroCalcs – MVP locale. Nessun dato inviato a server.
   </footer>
+<script>
+  // Mostra errori JS direttamente nella pagina (utile su iPhone)
+  window.addEventListener("error", (e) => {
+    const pre = document.createElement("pre");
+    pre.style.whiteSpace = "pre-wrap";
+    pre.style.padding = "12px";
+    pre.style.margin = "12px";
+    pre.style.border = "1px solid #ff9b9b";
+    pre.style.borderRadius = "12px";
+    pre.style.background = "#200";
+    pre.textContent = "JS ERROR:\n" + (e.message || e.error || "Errore sconosciuto") + "\n" +
+      (e.filename ? `File: ${e.filename}\nLine: ${e.lineno}:${e.colno}\n` : "");
+    document.body.prepend(pre);
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+    const pre = document.createElement("pre");
+    pre.style.whiteSpace = "pre-wrap";
+    pre.style.padding = "12px";
+    pre.style.margin = "12px";
+    pre.style.border = "1px solid #ff9b9b";
+    pre.style.borderRadius = "12px";
+    pre.style.background = "#200";
+    pre.textContent = "PROMISE ERROR:\n" + (e.reason?.message || String(e.reason));
+    document.body.prepend(pre);
+  });
+</script>
+
 
   <script type="module" src="./app.js"></script>
 </body>
