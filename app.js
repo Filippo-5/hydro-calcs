@@ -1,9 +1,10 @@
-// app.js
+import { calcOilHeating } from "./core/oilHeating.js";
+
+// Blocco accesso (MVP)
 if (prompt("Chiave accesso") !== "HYDRO1") {
   document.body.innerHTML = "Accesso negato";
+  throw new Error("Access denied");
 }
-
-import { calcOilHeating } from "./core/oilHeating.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -86,5 +87,4 @@ $("#btn_calc").addEventListener("click", (e) => {
   compute();
 });
 
-// Primo calcolo
 compute();
