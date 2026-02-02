@@ -1,4 +1,8 @@
 // app.js
+if (prompt("Chiave accesso") !== "HYDRO1") {
+  document.body.innerHTML = "Accesso negato";
+}
+
 import { calcOilHeating } from "./core/oilHeating.js";
 
 const $ = (sel) => document.querySelector(sel);
